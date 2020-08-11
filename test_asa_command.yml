@@ -1,0 +1,17 @@
+---
+- hosts: asa
+  gather_facts: false
+  connection: network_cli
+
+
+  tasks:
+    - name: show running-config
+      asa_command:
+        commands: 
+          - show running-config
+      register: running
+
+
+    - name: debug
+      debug:
+        var: running.stdout_lines

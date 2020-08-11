@@ -1,0 +1,19 @@
+---
+- hosts: asa
+  gather_facts: false
+  connection: network_cli
+
+
+  tasks:
+    - name: show access-list
+      asa_command:
+        commands: 
+          - show access-list | grep TestACL
+      register: result
+
+
+    - name: debug
+      debug:
+        var: acl
+      vars: 
+        acl: "{{ result.stdout[0] | parse_cli_textfsm('templates/cisco_asa_show_access-list.template') }}"

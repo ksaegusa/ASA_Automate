@@ -1,0 +1,9 @@
+---
+- hosts: asa
+  gather_facts: true
+  connection: network_cli
+
+  tasks:
+    - name: facts debug
+      debug:
+        var: ansible_facts

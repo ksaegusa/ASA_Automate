@@ -1,0 +1,58 @@
+---
+- hosts: asa
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: add object
+      asa_config:
+        lines:
+          - host 8.8.8.8
+        parents: object network H-8.8.8.8s
+      register: running
+
+    - name: add service object-group
+      asa_og:
+        name: ansible_test_2
+        group_type: service-object
+        state: present
+        description: ansible_test object-group description
+        service_cfg:
+          - tcp destination eq 8080
+          - tcp destination eq www
+
+    - name: configure network object-group
+      asa_og:
+        name: ansible_test_0
+        group_type: network-object
+        state: present
+        description: ansible_test object-group description
+        host_ip:
+          - 8.8.8.8
+          - 8.8.4.4
+        ip_mask:
+          - 10.0.0.0 255.255.255.0
+          - 192.168.0.0 255.255.0.0
+        group_object:
+          - awx_lon
+          - awx_ams
+
+    - name: configure port-object object-group
+      asa_og:
+        name: ansible_test_1
+        group_type: port-object
+        state: present
+        description: ansible_test object-group description
+        protocol: tcp-udp
+        port_eq:
+          - '1025'
+          - kerberos
+        port_range:
+          - '1025 5202'
+          - '0 1024'
+      register: result
+
+
+    - name: debug
+      debug:
+        var: result
